@@ -75,7 +75,7 @@ angular.module( "wall.services", [] )
                     // Remove merged pull request
                     if( pullIndex !== null )
                     {
-                        currentRepo.gravatar = currentRepo.pulls[ pullIndex ].gravatar;
+                        currentRepo.gravatars = currentRepo.pulls[ pullIndex ].gravatars;
 
                         if( build.status == "Started" )
                         {
@@ -96,7 +96,7 @@ angular.module( "wall.services", [] )
                     {
                         currentRepo.lastMerge = build.started_at;
                         currentRepo.status    = build.status;
-                        currentRepo.gravatar  = checkMerge ? currentRepo.gravatar : build.gravatar;
+                        currentRepo.gravatars  = checkMerge ? currentRepo.gravatars : build.gravatars;
                     }
                 }
 
@@ -250,9 +250,9 @@ angular.module( "wall.services", [] )
         var parseBuild = function ( build )
         {
             // Require gravatars, and don't give credit for merges
-            if( build.gravatar && !build.message.match( /Merge pull request #([0-9]+)/i ) )
+            if( build.gravatars && !build.message.match( /Merge pull request #([0-9]+)/i ) )
             {
-                var currentDeveloper = findDeveloper( build.gravatar ) || addDeveloper( build );
+                var currentDeveloper = findDeveloper( build.gravatars ) || addDeveloper( build );
 
                 if( build.status == "Success" )
                 {
@@ -271,23 +271,22 @@ angular.module( "wall.services", [] )
 
         };
 
-        var findDeveloper = function ( gravatar )
+        var findDeveloper = function ( gravatars )
         {
             for( var i = 0; i < developers.length; i++ )
             {
-                if( developers[ i ].gravatar === gravatar )
+                if( arraysEqual(developers[ i ].gravatars, gravatars ) )
                 {
                     return developers[ i ];
                 }
             }
-
             return null;
         };
 
         var addDeveloper = function ( build )
         {
             var newDeveloper = {
-                gravatar:  build.gravatar,
+                gravatars:  build.gravatars,
                 builds:    0,
                 successes: 0,
                 failures:  0,
@@ -320,3 +319,13 @@ angular.module( "wall.services", [] )
     }
 
 ] );
+
+function arraysEqual( arr1, arr2 ) {
+    if( arr1.length !== arr2.length )
+        return false;
+    for( var i = arr1.length; i--; ) {
+        if( arr1[i] !== arr2[i] )
+            return false;
+    }
+    return true;
+}

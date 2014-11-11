@@ -1,5 +1,5 @@
 "use strict";
-
+var md5 = require("MD5");
 var express = require( "express" );
 var http    = require( "http" );
 var https   = require( "https" );
@@ -20,8 +20,9 @@ var serveFeed = function ( req, res, next )
 {
     var apiScheme = process.env.API_SCHEME || "https";
     var apiDomain = process.env.API_DOMAIN || "";
-    var apiPort   = process.env.API_PORT || (apiScheme == "https" ? 443 : 80);
+    var apiPort   = process.env.API_PORT   || (apiScheme == "https" ? 443 : 80);
     var apiToken  = process.env.API_TOKEN  || "";
+    var pairPrefix= process.env.PAIR_PREFIX|| "";
 
     var path   = "/api/user/feed?access_token=" + apiToken;
     var client = apiScheme == "https" ? https : http;
@@ -43,6 +44,9 @@ var serveFeed = function ( req, res, next )
         } ).on( "end", function( )
         {
             var feed = JSON.parse(body);
+            for (var i = 0; i < feed.length; ++i) {
+                feed[i].gravatars = extractGravatars(feed[i].author, pairPrefix);
+            }
             res.send(feed);
 
         } );
@@ -58,3 +62,20 @@ app.route( "/api/feed" ).get( serveFeed );
 app.route( "*" ).get( serveIndex );
 
 http.createServer( app ).listen( process.env.PORT || 3000 );
+
+function extractGravatars( author, pairPrefix ) {
+    var gravatars = [];
+    if( pairPrefix.length > 0 && author.search(pairPrefix) == 0 ) {
+        var parts  = author.split( '@' );
+        var people = parts[0].split( '+' );
+
+        for (var j = 1; j < people.length; ++j) {
+            var email = people[j] + '@' + parts[1];
+            gravatars.push( md5( email ) );
+        }
+    }
+    else {
+        gravatars.push( md5(author) );
+    }
+    return gravatars;
+}

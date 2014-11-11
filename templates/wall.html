@@ -14,8 +14,8 @@
             <li data-ng-repeat="repo in displayRepos" class="[[ repo.status ]]" data-scroll-repo>
 
                 <div class="author">
-                    <img data-ng-src="[[ gravatarPrefix + repo.gravatar ]]?s=100" data-ng-if="repo.gravatar">
-                    <span class="no-author" data-ng-if="!repo.gravatar"><i class="fa fa-user" data-ng-if="repo.lastMerge"></i></span>
+                    <img data-ng-repeat="gravatar in repo.gravatars" data-ng-src="[[ gravatarPrefix + gravatar ]]?s=100" data-ng-if="gravatar">
+                    <span class="no-author" data-ng-if="!repo.gravatars"><i class="fa fa-user" data-ng-if="repo.lastMerge"></i></span>
                     <i class="fa fa-circle-o-notch fa-spin" data-ng-if="repo.status == 'Started'"></i>
                 </div>
 
@@ -87,7 +87,7 @@
 
                 <div class="container">
                     <div class="developer">
-                        <img data-ng-src="[[ gravatarPrefix + developer.gravatar ]]?s=100" class="builder">
+                        <img data-ng-repeat="gravatar in developer.gravatars" data-ng-src="[[ gravatarPrefix + gravatar ]]?s=100" data-ng-if="gravatar" class="builder">
                     </div>
                     <span data-ng-class="{ successes: developer.successes > 0 }">[[ developer.successes ]]</span>
                     <span data-ng-class="{ failures: developer.failures > 0 }">[[ developer.failures ]]</span>
@@ -110,7 +110,7 @@
             <li class="[[ build.status ]]" data-ng-repeat="build in builds | orderBy: 'created_at': true | limitTo: maxBuilds">
 
                 <div class="author">
-                    <img data-ng-src="[[ gravatarPrefix + build.gravatar ]]?s=100" data-ng-if="build.gravatar">
+                    <img data-ng-repeat="gravatar in build.gravatars" data-ng-src="[[ gravatarPrefix + gravatar ]]?s=100" data-ng-if="gravatar" class="builder">
                     <span class="no-author" data-ng-if="!build.gravatar"><i class="fa fa-user"></i></span>
                     <i class="fa fa-circle-o-notch fa-spin" data-ng-if="build.status == 'Started'"></i>
                 </div>

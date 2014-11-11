@@ -144,8 +144,21 @@ angular.module( "wall.controllers", [] )
 
         };
 
+        var swapGravatars = function()
+        {
+            var authors = $("div.author, div.developer");
+            for( var i = 0; i < authors.length; ++i ) {
+                var avatars = $( authors[i] ).children( 'img' );
+                if( avatars.length > 1 ) {
+                    var first = $( avatars[0] );
+                    $( authors[i] ).append(first.detach());
+                }
+            }
+        };
+
         processStatus();
         $interval( processStatus, 5000 );
+        $interval( swapGravatars, 3000 );
 
         // Update running totals
 
