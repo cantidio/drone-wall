@@ -18,25 +18,32 @@ var serveIndex = function ( req, res, next )
 
 var serveFeed = function ( req, res, next )
 {
-    var apiScheme = process.env.API_SCHEME || "https";
-    var apiDomain = process.env.API_DOMAIN || "";
-    var apiPort   = process.env.API_PORT   || (apiScheme == "https" ? 443 : 80);
-    var apiToken  = process.env.API_TOKEN  || "";
-    var pairPrefix= process.env.PAIR_PREFIX|| "";
+    var apiScheme  = process.env.API_SCHEME  || "https";
+    var apiDomain  = process.env.API_DOMAIN  || "";
+    var apiPort    = process.env.API_PORT    || (apiScheme == "https" ? 443 : 80);
+    var apiToken   = process.env.API_TOKEN   || "";
+    var pairPrefix = process.env.PAIR_PREFIX || "";
 
+    var host   = apiDomain;
+    var port   = apiPort;
     var path   = "/api/user/feed?access_token=" + apiToken;
     var client = apiScheme == "https" ? https : http;
 
+    if( process.env.HTTP_PROXY )
+    {
+        var proxy = process.env.HTTP_PROXY.replace('http://', '');
+
+        host = proxy.split(':')[0];
+        port = proxy.split(':')[1] || 80;
+        path = apiScheme + "://" + apiDomain + ":" + apiPort + path;
+    }
+
     var req = client.get(
     {
-        "host": "web-proxy.corp.hp.com",
-        "port": "8088",
-        "path": apiScheme + "://" + apiDomain + ":" + apiPort + path,
-				 "headers": {
-				    "Host": apiDomain + ":" + apiPort + path
-				  }
-
-    }, function( result )
+        "host": host,
+        "port": port,
+        "path": path
+    }, function (result)
     {
         var body = "";
 
