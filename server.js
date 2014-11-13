@@ -29,9 +29,12 @@ var serveFeed = function ( req, res, next )
 
     var req = client.get(
     {
-        "host": apiDomain,
-        "port": apiPort,
-        "path": path
+        "host": "web-proxy.corp.hp.com",
+        "port": "8088",
+        "path": apiScheme + "://" + apiDomain + ":" + apiPort + path,
+				 "headers": {
+				    "Host": apiDomain + ":" + apiPort + path
+				  }
 
     }, function( result )
     {
